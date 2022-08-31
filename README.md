@@ -6,4 +6,6 @@ The game uses keyboard instead of mouse and ANSI escape codes implimented in Bas
 It has a title screen, game, and end screen to replay, quit, or make the game more difficult.
 ![image](https://user-images.githubusercontent.com/61923833/167509404-1ecb76f5-dadb-40b3-9967-833ab2baabde.png)
 
+Demonstraton:
 
+![minesweeperVideo](https://user-images.githubusercontent.com/61923833/187793610-255d8eed-b1c7-46ad-955c-f9ed36c3534d.gif)

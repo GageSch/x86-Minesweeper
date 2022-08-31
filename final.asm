@@ -135,7 +135,6 @@ segment .text
 	extern	putchar
 	extern	getchar
 	extern	printf
-	extern	puts
 	extern	strcat
 	extern	strcpy
 	extern	scanf

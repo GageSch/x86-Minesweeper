@@ -1,5 +1,3 @@
-%include "/usr/local/share/csc314/asm_io.inc"
-
 ; the file that stores the initial state
 %define BOARD_FILE 'board.txt'
 
@@ -30,7 +28,7 @@
 %define DIGCHAR	'e'
 
 segment .data
-	number_mines		dd	40
+	number_mines		dd	60
 
 	; used to fopen the board file defined above
 	board_file			db BOARD_FILE,0
@@ -93,24 +91,26 @@ segment .data
 
 	carriagereturn_str	db	13, 0
 
-	cursor_str			db	`\e[1;7m%c\e[0m`, 0
+	cursor_str			db	`\e[7m%c\e[0m`, 0
+
+	wall_str			db	`\e[30;47m`, WALL_CHAR, `\e[0m`, 0
 
 	covered_str			db	`\e[37;47m`, COVEREDCHAR, `\e[0m`, 0
 
-	empty_str			db	`\e[90;100m`, EMPTYCHAR, `\e[0m`, 0
+	empty_str			db	`\e[30;40m`, EMPTYCHAR, `\e[0m`, 0
 
-	one_str				db	`\e[34;100m1\e[0m`, 0
-	two_str				db	`\e[32;100m2\e[0m`, 0
-	three_str			db	`\e[31;100m3\e[0m`, 0
-	four_str			db	`\e[91;100m4\e[0m`, 0
-	five_str			db	`\e[36;100m5\e[0m`, 0
-	six_str				db	`\e[92;100m6\e[0m`, 0
-	seven_str			db	`\e[96;100m7\e[0m`, 0
-	eight_str			db	`\e[95;100m8\e[0m`, 0
+	one_str				db	`\e[34;40m1\e[0m`, 0
+	two_str				db	`\e[32;40m2\e[0m`, 0
+	three_str			db	`\e[35;40m3\e[0m`, 0
+	four_str			db	`\e[91;40m4\e[0m`, 0
+	five_str			db	`\e[36;40m5\e[0m`, 0
+	six_str				db	`\e[92;40m6\e[0m`, 0
+	seven_str			db	`\e[96;40m7\e[0m`, 0
+	eight_str			db	`\e[95;40m8\e[0m`, 0
 
 	mine_str			db	`\e[30;41m`, MINECHAR, `\e[0m`, 0
 
-	flag_str			db	`\e[31;47m`, FLAGGED, `\e[0m`, 0
+	flag_str			db	`\e[30;47m`, FLAGGED, `\e[0m`, 0
 
 segment .bss
 
@@ -125,7 +125,7 @@ segment .bss
 
 segment .text
 
-	global	asm_main
+	global	_start
 	global  raw_mode_on
 	global  raw_mode_off
 	global  init_board
@@ -147,7 +147,7 @@ segment .text
 	extern	rand
 	extern	time
 
-asm_main:
+_start:
 	push	ebp
 	mov		ebp, esp
 
@@ -412,7 +412,9 @@ asm_main:
 	;restore old terminal functionality
 	call raw_mode_off
 
-	mov		eax, 0
+	mov		eax, 1
+	int		0x80
+
 	mov		esp, ebp
 	pop		ebp
 	ret
@@ -566,7 +568,7 @@ render:
 				mov		ebx, 0
 				mov		bl, BYTE [board + eax]
 				cmp		bl, WALL_CHAR
-				je		print_end
+				je		wall
 				cmp		bl, COVEREDCHAR
 				je		cover
 				cmp		bl, EMPTYCHAR
@@ -592,6 +594,9 @@ render:
 				cmp		bl, '8'
 				je		eight
 
+				wall:
+				push	wall_str
+				jmp		calling
 				cover:
 				push	covered_str
 				jmp		calling
